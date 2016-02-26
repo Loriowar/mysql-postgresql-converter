@@ -151,10 +151,14 @@ def parse(input_filename, output_filename):
                     type = "timestamp with time zone"
                 elif type == "double":
                     type = "double precision"
+                elif type == "tinyblob":
+                    type = "text"
                 elif type == "blob":
-                    type = "bytea"
+                    type = "text"
+                elif type == "mediumblob":
+                    type = "text"
                 elif type == "longblob":
-                    type = "bytea"
+                    type = "text"
                 elif type.startswith("enum(") or type.startswith("set("):
 
                     types_str = type.split("(")[1].rstrip(")").rstrip('"')
