@@ -181,7 +181,7 @@ def parse(input_filename, output_filename):
                         cast_lines.append("ALTER TABLE \"%s\" ALTER COLUMN \"%s\" SET DEFAULT %s" % (current_table, name, final_default))
                 # ID fields need sequences [if they are integers?]
                 if name == "id" and set_sequence is True:
-                    sequence_lines.append("CREATE SEQUENCE %s_id_seq OWNED BY %s.id" % (current_table, current_table))
+                    sequence_lines.append("CREATE SEQUENCE \"%s_id_seq\" OWNED BY \"%s\".\"id\"" % (current_table, current_table))
                     sequence_lines.append("SELECT setval('%s_id_seq', max(id)) FROM %s" % (current_table, current_table))
                     sequence_lines.append("ALTER TABLE \"%s\" ALTER COLUMN \"id\" SET DEFAULT nextval('%s_id_seq')" % (current_table, current_table))
                 # Record it
@@ -201,7 +201,9 @@ def parse(input_filename, output_filename):
                 fulltext_key_lines.append("CREATE INDEX ON %s USING gin(to_tsvector('english', %s))" % (current_table, fulltext_keys))
 
             elif line.startswith("KEY"):
-                pass
+                index_name = line.split(' ')[1]
+                index_fields = line.split(' ')[-1].strip(',')
+                foreign_key_lines.append("CREATE INDEX %s ON \"%s\" %s" % (index_name, current_table, index_fields))
             # Is it the end of the table?
             elif line == ");":
                 output.write("CREATE TABLE \"%s\" (\n" % current_table)
